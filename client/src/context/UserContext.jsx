@@ -16,7 +16,12 @@ export const UserProvider = ({children}) => {
                 console.log(res?.data?.data)
                 setUser(res?.data?.data)
             } catch (error) {
+                if(error.response.status === 401){
+                    console.warn("User not logged in")
+                }
                 setUser(null)
+
+
             }finally{
                 setLoading(false)
             }

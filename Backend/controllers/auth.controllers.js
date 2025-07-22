@@ -98,7 +98,6 @@ export const verifyOTP = async (req, res) => {
     await user.save();
 
     const { password, ...userWithoutPassword } = user._doc;
-
     return successHandler(
       res,
       200,
@@ -175,3 +174,8 @@ export const logout = (req, res) => {
     return errorHandler(res, 500, "Logout Failed!")
   }
 };
+
+
+export const updatePassword = (req, res) => {
+  
+}
