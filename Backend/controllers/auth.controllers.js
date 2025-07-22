@@ -146,7 +146,7 @@ export const login = async (req, res) => {
       isAdmin,
       ...otherDetails
     } = user._doc;
-
+    otherDetails.token = token
     res.cookie("access_token", token, { httpOnly: true });
 
     return successHandler(

@@ -14,7 +14,7 @@ export default function OtpModal() {
     console.log(otpNumber)
 
     try {
-        const res = await axios.post('http://localhost:5000/api/auth/verifyEmail', {
+        const res = await axios.post('https://hackathon-sage-zeta.vercel.app/api/auth/verifyEmail', {
             otp: otpNumber,
             _id : user._id
         })
