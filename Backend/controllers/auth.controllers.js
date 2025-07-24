@@ -6,6 +6,7 @@ import { generateOTP } from "../utils/generateOTP.js";
 import { sendMail } from "../utils/sendMail.js";
 import { generateToken } from "../utils/generateToken.js";
 import dotenv from "dotenv";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 dotenv.config();
 
@@ -14,10 +15,9 @@ export const register = async (req, res) => {
   console.log(req.file);
   const { userName, email, password, country, city } = req.body;
   console.log(userName)
-  const imagePath = req.file ? req.file.path : null;
+  // const imagePath = req.file ? req.file.path : null;
   if (!userName || !email || !password || !country || !city) {
     return errorHandler(res, 400, "Missing Fields!");
-    console.log("Missing Fields")
   }
 
   const isExist = await User.findOne({
@@ -33,7 +33,6 @@ export const register = async (req, res) => {
   }
 
   try {
-    console.log("Try block me aya")
     const otp = generateOTP();
 
     const emailSent = await sendMail(email, otp);
@@ -43,6 +42,13 @@ export const register = async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashPassword = bcrypt.hashSync(password, salt);
 
+    let uploadImageUrl = "";
+    if(req.file){
+      uploadImageUrl = await uploadOnCloudinary(req.file)
+      console.log(uploadImageUrl)
+    }
+
+
     const newUser = await User.create({
       userName: userName,
       email: email,
@@ -51,7 +57,7 @@ export const register = async (req, res) => {
       city: city,
       otp: otp,
       otpExpires: Date.now() + 600000,
-      img: imagePath,
+      img: uploadImageUrl || "",
     });
 
     if (newUser) {

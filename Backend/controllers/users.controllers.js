@@ -4,7 +4,7 @@ import { successHandler } from "../utils/successHandler.js";
 
 export const getMe = async (req, res) => {
     try{
-        // console.log(req.user.id)
+        console.log(req.user.id)
         const user = await User.findById(req.user.id).select("-password -otp -otpExpires")
         if(!user){
             return errorHandler(res, 400, "user not found!")

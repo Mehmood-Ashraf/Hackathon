@@ -68,9 +68,7 @@ export default function Navbar() {
                   className="rounded-full"
                   src={
                     user?.img
-                      ? `http://localhost:5000/${user.img
-                          .replace("public\\", "")
-                          .replace("\\", "/")}`
+                      ? user?.img
                       : "/default-user.png"
                   }
                   alt="User"

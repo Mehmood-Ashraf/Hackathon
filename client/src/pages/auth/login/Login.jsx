@@ -15,6 +15,9 @@ const Login = () => {
     password : ""
   })
 
+  const baseUrl = import.meta.env.VITE_BASE_URL
+  const localUrl = import.meta.env.VITE_LOCAL_URL
+
   const navigate = useNavigate()
 
   const handleChange = (e) => {
@@ -24,7 +27,7 @@ const Login = () => {
   const loginHandler = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post("https://hackathon-sage-zeta.vercel.app/api/auth/login", formData, { withCredentials : true })
+      const res = await axios.post(`${localUrl}/api/auth/login`, formData, { withCredentials : true })
       if(res?.data?.status){
         toast.success("Logged In Successfully")
         setUser(res?.data?.data)

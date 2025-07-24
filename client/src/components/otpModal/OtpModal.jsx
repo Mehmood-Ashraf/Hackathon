@@ -9,12 +9,15 @@ export default function OtpModal() {
   const [otpNumber, setOtpNumber] = useState("");
   const navigate = useNavigate()
 
+  const baseUrl = import.meta.env.VITE_BASE_URL
+  const localUrl = import.meta.env.VITE_LOCAL_URL
+
   const handleVerify = async () => {
     console.log(user)
     console.log(otpNumber)
 
     try {
-        const res = await axios.post('https://hackathon-sage-zeta.vercel.app/api/auth/verifyEmail', {
+        const res = await axios.post(`${localUrl}/api/auth/verifyEmail`, {
             otp: otpNumber,
             _id : user._id
         })

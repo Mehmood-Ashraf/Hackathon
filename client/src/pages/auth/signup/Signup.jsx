@@ -21,6 +21,8 @@ export default function Signup() {
     city: "",
   });
   const [imgFile, setImgFile] = useState("");
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const localUrl = import.meta.env.VITE_LOCAL_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,24 +46,22 @@ export default function Signup() {
     try {
       const data = new FormData();
 
-      data.append("userName", formData.userName.trim().toLowerCase());
+      data.append("userName", formData.userName);
       data.append("email", formData.email);
       data.append("password", formData.password);
       data.append("country", formData.country);
       data.append("city", formData.city);
 
       if (imgFile) data.append("img", imgFile);
-      console.log(data)
+      console.log(data);
 
       const newUser = {
         ...formData,
         img: imgFile,
       };
       const res = await axios.post(
-        "https://hackathon-sage-zeta.vercel.app/api/auth/register",
-        newUser, { headers : {
-          "Content-Type" : "application/json"
-        }}
+        `${localUrl}/api/auth/register`, //https://hackathon-sage-zeta.vercel.app
+        data
       );
       if (res?.data?.status) {
         setUser(res.data.data);
@@ -71,8 +71,9 @@ export default function Signup() {
         console.log(user);
       }
     } catch (error) {
-      console.error("Signup Failed", error.message);
-      toast.error("SignUp Failed!" || res.message);
+      console.log(error?.response?.data?.message);
+      console.log("Signup Failed");
+      toast.error(error?.response?.data?.message || "SignUp Failed!");
     }
   };
 
