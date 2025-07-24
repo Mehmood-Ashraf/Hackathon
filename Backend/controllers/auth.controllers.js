@@ -17,11 +17,13 @@ export const register = async (req, res) => {
   const imagePath = req.file ? req.file.path : null;
   if (!userName || !email || !password || !country || !city) {
     return errorHandler(res, 400, "Missing Fields!");
+    console.log("Missing Fields")
   }
 
   const isExist = await User.findOne({
     $or: [{ email: email }, { userName: userName }],
   });
+  console.log("already taken")
   if (isExist) {
     return errorHandler(
       res,
@@ -31,6 +33,7 @@ export const register = async (req, res) => {
   }
 
   try {
+    console.log("Try block me aya")
     const otp = generateOTP();
 
     const emailSent = await sendMail(email, otp);

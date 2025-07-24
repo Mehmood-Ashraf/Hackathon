@@ -51,6 +51,7 @@ export default function Signup() {
       data.append("city", formData.city);
 
       if (imgFile) data.append("img", imgFile);
+      console.log(data)
 
       const newUser = {
         ...formData,
@@ -58,7 +59,9 @@ export default function Signup() {
       };
       const res = await axios.post(
         "https://hackathon-sage-zeta.vercel.app/api/auth/register",
-        data
+        newUser, { headers : {
+          "Content-Type" : "application/json"
+        }}
       );
       if (res?.data?.status) {
         setUser(res.data.data);
