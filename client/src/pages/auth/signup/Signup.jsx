@@ -1,12 +1,18 @@
-import axios from "axios";
+import axios, { formToJSON } from "axios";
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import OtpModal from "../../../components/otpModal/OtpModal";
 import { UserContext } from "../../../context/UserContext";
+import { GoEye } from "react-icons/go";
+import { GoEyeClosed } from "react-icons/go";
+import { validateForm } from "../../../utils/formValidation";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
+  const [showPassword, setShowPassword] = useState(false);
   const { user, setUser, showOtpModal, setShowOtpModal } =
     useContext(UserContext);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     userName: "",
     email: "",
@@ -24,10 +30,21 @@ export default function Signup() {
     e.preventDefault();
     console.log(imgFile);
 
+    // if(formData.password.length < 8){
+    //   toast.error("Password must be at least 8 characters long")
+    // }
+
+    const validationErrors = validateForm(formData, "signup");
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      return toast.error("Please fix the validation Errors");
+    }
+
     try {
       const data = new FormData();
 
-      data.append("userName", formData.userName);
+      data.append("userName", formData.userName.trim().toLowerCase());
       data.append("email", formData.email);
       data.append("password", formData.password);
       data.append("country", formData.country);
@@ -48,7 +65,7 @@ export default function Signup() {
         toast.success("User registered successfully, OTP sent to your Email");
         setShowOtpModal(true);
         console.log(res.data.data);
-        console.log(user)
+        console.log(user);
       }
     } catch (error) {
       console.error("Signup Failed", error.message);
@@ -86,6 +103,9 @@ export default function Signup() {
                 name="userName"
                 value={formData.userName}
               />
+              {errors.userName && (
+                <p className="text-red-500 text-xs mt-1">{errors.userName}</p>
+              )}
             </div>
             <div className="mb-2">
               <label
@@ -103,8 +123,11 @@ export default function Signup() {
                 placeholder="Email"
                 name="email"
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
-            <div className="mb-2">
+            <div className="mb-2 relative">
               <label
                 className="block text-gray-700 text-sm font-bold mb-1"
                 htmlFor="password"
@@ -116,11 +139,20 @@ export default function Signup() {
                 className="shadow appearance-none border  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 value={formData.password}
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 required
                 name="password"
               />
+              <span
+                className="absolute right-3 top-9 cursor-pointer text-gray-600"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <GoEye /> : <GoEyeClosed />}
+              </span>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
             </div>
 
             <div className="flex items-center gap-3 mb-2 flex-col sm:flex-row">
@@ -140,6 +172,9 @@ export default function Signup() {
                   placeholder="Country"
                   name="country"
                 />
+                {errors.country && (
+                  <p className="text-red-500 text-xs mt-1">{errors.country}</p>
+                )}
               </div>
               <div className="w-full">
                 <label
@@ -157,6 +192,9 @@ export default function Signup() {
                   placeholder="City"
                   name="city"
                 />
+                {errors.city && (
+                  <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+                )}
               </div>
             </div>
 
@@ -174,9 +212,7 @@ export default function Signup() {
 
             <div className="text-muted-foreground flex justify-center gap-1 text-sm mb-6">
               <p>Already have an account?</p>
-              <a href="/login" className="text-primary font-medium hover:underline">
-                Log in
-              </a>
+              <Link to="/login">Log in</Link>
             </div>
 
             <button

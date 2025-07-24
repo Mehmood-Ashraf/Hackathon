@@ -15,7 +15,7 @@ export default function Navbar() {
   const logoutHandler = async () => {
     try {
       const logoutUser = await axios.post(
-        "http://localhost:5000/api/auth/logout",
+        "https://hackathon-sage-zeta.vercel.app/api/auth/logout",
         {},
         {
           withCredentials: true,
@@ -23,6 +23,7 @@ export default function Navbar() {
       );
       if (logoutUser) {
         toast.success("UserLoggedout Successfully!");
+        localStorage.removeItem("token")
       }
       setUser(null);
     } catch (error) {

@@ -147,8 +147,11 @@ export const login = async (req, res) => {
       ...otherDetails
     } = user._doc;
     otherDetails.token = token
-    res.cookie("access_token", token, { httpOnly: true });
-
+    res.cookie("access_token", token, { httpOnly: true,
+      secure: false,
+      sameSite: "Lax",
+     });
+    
     return successHandler(
       res,
       200,

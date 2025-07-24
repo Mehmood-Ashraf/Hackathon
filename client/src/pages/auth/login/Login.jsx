@@ -3,8 +3,12 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { UserContext } from "../../../context/UserContext";
+import { GoEye } from "react-icons/go";
+import { GoEyeClosed } from "react-icons/go";
+
 
 const Login = () => {
+  const [showPassword, setShowPassword] = useState(false)
   const { setUser } = useContext(UserContext) 
   const [formData, setFormData] = useState({
     email : "",
@@ -24,6 +28,8 @@ const Login = () => {
       if(res?.data?.status){
         toast.success("Logged In Successfully")
         setUser(res?.data?.data)
+        localStorage.setItem("token", res?.data?.data?.token)
+        console.log(res.data.data.token)
         navigate('/')
       }else{
         toast.error(res?.data?.message || "Login Failed")
@@ -63,7 +69,7 @@ const Login = () => {
               value={formData.email}
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
               htmlFor="password"
@@ -73,13 +79,14 @@ const Login = () => {
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}
               placeholder="Password"
               onChange={handleChange}
               required
             />
+            <span className="absolute right-3 top-9 cursor-pointer text-gray-600" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <GoEye /> : <GoEyeClosed />}</span>
           </div>
 
           <button

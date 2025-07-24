@@ -12,7 +12,8 @@ export const UserProvider = ({children}) => {
         const fetchUser = async () => {
             console.log("UseEffect chala......")
             try {
-                const res = await axios.get("https://hackathon-sage-zeta.vercel.app/api/users/me", { withCredentials : true })
+                const res = await axios.get("https://hackathon-sage-zeta.vercel.app/api/users/me", { withCredentials : true, headers: { Authorization : `Bearer ${localStorage.getItem("token")}`
+            } })
                 console.log(res?.data?.data)
                 setUser(res?.data?.data)
             } catch (error) {
