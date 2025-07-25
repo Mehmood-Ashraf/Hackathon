@@ -31,11 +31,11 @@ const Login = () => {
       if(res?.data?.status){
         toast.success("Logged In Successfully")
         setUser(res?.data?.data)
-        localStorage.setItem("token", res?.data?.data?.token)
+        // localStorage.setItem("token", res?.data?.data?.token)
         console.log(res.data.data.token)
         navigate('/')
       }else{
-        toast.error(res?.data?.message || "Login Failed")
+         toast.error(res?.data?.message || "Login Failed")
       }
     } catch (error) {
       console.log(error)

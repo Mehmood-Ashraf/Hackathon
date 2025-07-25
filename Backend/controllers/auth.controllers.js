@@ -160,6 +160,7 @@ export const login = async (req, res) => {
     res.cookie("access_token", token, { httpOnly: true,
       secure: false,
       sameSite: "Lax",
+      path : "/"
      });
     
     return successHandler(
@@ -181,6 +182,7 @@ export const logout = (req, res) => {
       httpOnly: true,
       sameSite: "Lax",
       secure: false,
+      path : "/"
     });
     return successHandler(res, 200, "Logged out successfully!");
   } catch (error) {
