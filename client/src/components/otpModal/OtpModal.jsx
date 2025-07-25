@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { UserContext } from "../../context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function OtpModal() {
   const { setShowOtpModal, user} = useContext(UserContext)
@@ -35,6 +35,18 @@ export default function OtpModal() {
     }
   }
 
+  const resendOtpHandler = async () => {
+    console.log(user)
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_LOCAL_URL}/api/auth/resend-otp`, user)
+      console.log(response)
+      toast.success("Email send successfully!")
+    } catch (error) {
+      console.log(error?.response)
+      toast.error("Not send")
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg">
@@ -44,10 +56,12 @@ export default function OtpModal() {
         <input
           type="text"
           placeholder="Enter OTP"
-          className="border rounded p-2 w-full mb-4"
+          className="border rounded p-2 w-full mb-2"
           value={otpNumber}
           onChange={(e) => setOtpNumber(e.target.value)}
         />
+        <Link onClick={resendOtpHandler}>Resend OTP</Link>
+
         <div className="flex justify-end gap-2">
           <button
             onClick={handleVerify}

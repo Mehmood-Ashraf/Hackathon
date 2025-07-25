@@ -1,7 +1,8 @@
-export const errorHandler = (res, statusCode, message, error) => {
+export const errorHandler = (res, statusCode, message,  data) => {
     return res.status(statusCode).json({
         status: false,
         message: message,
-        error: error
+        // error: error,
+        ...data
     })
 }

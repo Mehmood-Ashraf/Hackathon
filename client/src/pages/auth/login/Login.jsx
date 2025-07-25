@@ -5,11 +5,12 @@ import { toast } from "react-toastify";
 import { UserContext } from "../../../context/UserContext";
 import { GoEye } from "react-icons/go";
 import { GoEyeClosed } from "react-icons/go";
+import OtpModal from "../../../components/otpModal/OtpModal";
 
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
-  const { setUser } = useContext(UserContext) 
+  const { setUser, user, showOtpModal, setShowOtpModal } = useContext(UserContext) 
   const [formData, setFormData] = useState({
     email : "",
     password : ""
@@ -39,7 +40,11 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error)
+      console.log(error?.response?.status)
       toast.error(error?.response?.data?.message || "Something went wrong!")
+      setUser({email : error?.response?.data?.email, _id : error?.response?.data?.id})
+      setShowOtpModal(true)
+      console.log(user)
     }
   }
 
@@ -100,6 +105,7 @@ const Login = () => {
           </button>
         </form>
       </div>
+      {showOtpModal && <OtpModal />}
     </div>
   );
 };

@@ -14,7 +14,7 @@ export const register = async (req, res) => {
   console.log(req.body);
   console.log(req.file);
   const { userName, email, password, country, city } = req.body;
-  console.log(userName)
+  console.log(userName);
   // const imagePath = req.file ? req.file.path : null;
   if (!userName || !email || !password || !country || !city) {
     return errorHandler(res, 400, "Missing Fields!");
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
   const isExist = await User.findOne({
     $or: [{ email: email }, { userName: userName }],
   });
-  console.log("already taken")
+  console.log("already taken");
   if (isExist) {
     return errorHandler(
       res,
@@ -43,11 +43,10 @@ export const register = async (req, res) => {
     const hashPassword = bcrypt.hashSync(password, salt);
 
     let uploadImageUrl = "";
-    if(req.file){
-      uploadImageUrl = await uploadOnCloudinary(req.file)
-      console.log(uploadImageUrl)
+    if (req.file) {
+      uploadImageUrl = await uploadOnCloudinary(req.file);
+      console.log(uploadImageUrl);
     }
-
 
     const newUser = await User.create({
       userName: userName,
@@ -74,7 +73,7 @@ export const register = async (req, res) => {
 };
 
 export const verifyOTP = async (req, res) => {
-  console.log("Verify otp chala")
+  console.log("Verify otp chala");
   const { otp, _id } = req.body;
   if (!otp || !_id) {
     return errorHandler(res, 400, "Please provide both user id and OTP ");
@@ -143,7 +142,8 @@ export const login = async (req, res) => {
       return errorHandler(
         res,
         400,
-        "Your account is not Verified. Please verify your email to login"
+        "Your account is not Verified. Please verify your email to login",
+        { email: user.email, id: user._id }
       );
     }
 
@@ -156,13 +156,14 @@ export const login = async (req, res) => {
       isAdmin,
       ...otherDetails
     } = user._doc;
-    otherDetails.token = token
-    res.cookie("access_token", token, { httpOnly: true,
+    otherDetails.token = token;
+    res.cookie("access_token", token, {
+      httpOnly: true,
       secure: false,
       sameSite: "Lax",
-      path : "/"
-     });
-    
+      path: "/",
+    });
+
     return successHandler(
       res,
       200,
@@ -176,21 +177,52 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  console.log("Run logout handler")
+  console.log("Run logout handler");
   try {
     res.clearCookie("access_token", {
       httpOnly: true,
       sameSite: "Lax",
       secure: false,
-      path : "/"
+      path: "/",
     });
     return successHandler(res, 200, "Logged out successfully!");
   } catch (error) {
-    return errorHandler(res, 500, "Logout Failed!")
+    return errorHandler(res, 500, "Logout Failed!");
   }
 };
 
+export const updatePassword = (req, res) => {};
 
-export const updatePassword = (req, res) => {
-  
-}
+export const resendOtp = async (req, res) => {
+  const { email } = req.body;
+  console.log("resendotp chala ==========>")
+
+  if (!email) {
+    return errorHandler(res, 400, "Email is required");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return errorHandler(res, 404, "User not found!");
+  }
+
+  if (user.isVerified) {
+    return errorHandler(res, 400, "User already verified!");
+  }
+
+  try {
+    const otp = generateOTP();
+
+    user.otp = otp
+    await user.save()
+
+    const emailSent = await sendMail(email, otp);
+    if (!emailSent) {
+      return errorHandler(res, 500, "Failed to send mail!");
+    }
+
+    return successHandler(res, 200, "OTP resent successfully")
+  } catch (error) {
+    return errorHandler(res, 500, error.message)
+  }
+};
