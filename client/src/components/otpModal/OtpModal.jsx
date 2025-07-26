@@ -9,29 +9,31 @@ export default function OtpModal() {
   const [otpNumber, setOtpNumber] = useState("");
   const navigate = useNavigate()
 
-  const baseUrl = import.meta.env.VITE_BASE_URL
-  const localUrl = import.meta.env.VITE_LOCAL_URL
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const localUrl = import.meta.env.VITE_LOCAL_URL;
 
   const handleVerify = async () => {
     console.log(user)
     console.log(otpNumber)
+    console.log(localUrl)
 
     try {
-        const res = await axios.post(`${localUrl}/api/auth/verifyEmail`, {
+        const res = await axios.post(`${import.meta.env.VITE_LOCAL_URL}/api/auth/verifyEmail`, {
             otp: otpNumber,
-            _id : user._id
+            _id : user?._id || localStorage.getItem("id")
         })
 
         console.log("API hit hue=====>", res)
 
         if(res.data?.status){
             toast.success("Email Verified Successfully!")
+            localStorage.removeItem("otpModalStatus")
             setShowOtpModal(false)
           navigate('/login')
         }
 
     } catch (error) {
-        toast.error(error.responsse?.data?.message || "Server Error")
+        toast.error(error.response?.data?.message || "Server Error")
     }
   }
 
@@ -43,7 +45,7 @@ export default function OtpModal() {
       toast.success("Email send successfully!")
     } catch (error) {
       console.log(error?.response)
-      toast.error("Not send")
+      toast.error("Email Not send")
     }
   }
 
@@ -65,13 +67,13 @@ export default function OtpModal() {
         <div className="flex justify-end gap-2">
           <button
             onClick={handleVerify}
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="bg-green-600 text-white px-4 py-2 rounded cursor-pointer"
           >
             Verify
           </button>
           <button
             onClick={() => setShowOtpModal(false)}
-            className="bg-red-500 text-white px-4 py-2 rounded"
+            className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
           >
             Close
           </button>

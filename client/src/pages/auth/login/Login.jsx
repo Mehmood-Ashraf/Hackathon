@@ -7,46 +7,68 @@ import { GoEye } from "react-icons/go";
 import { GoEyeClosed } from "react-icons/go";
 import OtpModal from "../../../components/otpModal/OtpModal";
 
-
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false)
-  const { setUser, user, showOtpModal, setShowOtpModal } = useContext(UserContext) 
+  const [showPassword, setShowPassword] = useState(false);
+  const { setUser, user, showOtpModal, setShowOtpModal } =
+    useContext(UserContext);
   const [formData, setFormData] = useState({
-    email : "",
-    password : ""
-  })
+    email: "",
+    password: "",
+  });
 
-  const baseUrl = import.meta.env.VITE_BASE_URL
-  const localUrl = import.meta.env.VITE_LOCAL_URL
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const localUrl = import.meta.env.VITE_LOCAL_URL;
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value})
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const loginHandler = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const res = await axios.post(`${localUrl}/api/auth/login`, formData, { withCredentials : true })
-      if(res?.data?.status){
-        toast.success("Logged In Successfully")
-        setUser(res?.data?.data)
+      const res = await axios.post(`${localUrl}/api/auth/login`, formData, {
+        withCredentials: true,
+      });
+      if (res?.data?.status) {
+        toast.success("Logged In Successfully");
+        setUser(res?.data?.data);
         // localStorage.setItem("token", res?.data?.data?.token)
-        console.log(res.data.data.token)
-        navigate('/')
-      }else{
-         toast.error(res?.data?.message || "Login Failed")
+        console.log(res.data.data.token);
+        navigate("/");
+      } else {
+        console.log(res?.data?.message)
+        toast.error(res?.data?.message || "Login Failed");
       }
     } catch (error) {
-      console.log(error)
-      console.log(error?.response?.status)
-      toast.error(error?.response?.data?.message || "Something went wrong!")
-      setUser({email : error?.response?.data?.email, _id : error?.response?.data?.id})
-      setShowOtpModal(true)
-      console.log(user)
+      console.log(error);
+      const status = error?.response?.status;
+      const errMsg = error?.response?.data;
+      console.log(status);
+      console.log(errMsg);
+      if (status === 404 && errMsg.message === "User not found!") {
+        toast.error("User not registered. Redirecting to signup.....");
+        setTimeout(() => {
+        navigate("/signup");
+        }, 5000)
+        return
+      } else if (status === 401 && errMsg.message === "Email not verified!") {
+        toast.error(
+          "Your account is not Verified. Please verify your email to login"
+        );
+        setUser({
+          email: error?.response?.data?.email,
+          _id: error?.response?.data?.id,
+        });
+        console.log(user);
+        localStorage.setItem("otpModalStatus", "true");
+        setShowOtpModal(true);
+      } else {
+        toast.error(error?.response?.data?.message || "Something went wrong!");
+      }
     }
-  }
+  };
 
   return (
     <div className="flex justify-center items-center h-dvh">
@@ -59,7 +81,10 @@ const Login = () => {
         </div> */}
           <h1 className="text-3xl font-semibold text-blue-600">Login</h1>
         </div>
-        <form onSubmit={loginHandler} className="bg-white rounded px-8 py-4 mb-4 flex flex-col justify-center ">
+        <form
+          onSubmit={loginHandler}
+          className="bg-white rounded px-8 py-4 mb-4 flex flex-col justify-center "
+        >
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
@@ -94,7 +119,12 @@ const Login = () => {
               onChange={handleChange}
               required
             />
-            <span className="absolute right-3 top-9 cursor-pointer text-gray-600" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <GoEye /> : <GoEyeClosed />}</span>
+            <span
+              className="absolute right-3 top-9 cursor-pointer text-gray-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <GoEye /> : <GoEyeClosed />}
+            </span>
           </div>
 
           <button

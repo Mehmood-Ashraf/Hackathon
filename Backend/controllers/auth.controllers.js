@@ -23,8 +23,8 @@ export const register = async (req, res) => {
   const isExist = await User.findOne({
     $or: [{ email: email }, { userName: userName }],
   });
-  console.log("already taken");
   if (isExist) {
+    console.log("already taken");
     return errorHandler(
       res,
       400,
@@ -130,7 +130,7 @@ export const login = async (req, res) => {
     }
     const user = await User.findOne({ email: email });
     if (!user) {
-      return errorHandler(res, 400, "Invalid credentials!");
+      return errorHandler(res, 404, "User not found!");
     }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
@@ -141,8 +141,8 @@ export const login = async (req, res) => {
     if (!user.isVerified) {
       return errorHandler(
         res,
-        400,
-        "Your account is not Verified. Please verify your email to login",
+        401,
+        "Email not verified!",
         { email: user.email, id: user._id }
       );
     }
@@ -194,6 +194,7 @@ export const logout = (req, res) => {
 export const updatePassword = (req, res) => {};
 
 export const resendOtp = async (req, res) => {
+  console.log(req.body)
   const { email } = req.body;
   console.log("resendotp chala ==========>")
 

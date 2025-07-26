@@ -1,5 +1,5 @@
 import axios, { formToJSON } from "axios";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import OtpModal from "../../../components/otpModal/OtpModal";
 import { UserContext } from "../../../context/UserContext";
@@ -23,6 +23,13 @@ export default function Signup() {
   const [imgFile, setImgFile] = useState("");
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const localUrl = import.meta.env.VITE_LOCAL_URL;
+
+  useEffect(() => {
+    const shouldShowOtpModal = localStorage.getItem("otpModalStatus")
+    if(shouldShowOtpModal === "true"){
+      setShowOtpModal(true)
+    }
+  }, [])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -53,18 +60,20 @@ export default function Signup() {
       data.append("city", formData.city);
 
       if (imgFile) data.append("img", imgFile);
-      console.log(data);
 
       const newUser = {
         ...formData,
         img: imgFile,
       };
       const res = await axios.post(
-        `${localUrl}/api/auth/register`, //https://hackathon-sage-zeta.vercel.app
+        `${localUrl}/api/auth/register`,
         data
       );
       if (res?.data?.status) {
         setUser(res.data.data);
+        localStorage.setItem("id", res?.data?.data?._id)
+        localStorage.setItem("otpModalStatus", "true")
+
         toast.success("User registered successfully, OTP sent to your Email");
         setShowOtpModal(true);
         console.log(res.data.data);
@@ -210,7 +219,7 @@ export default function Signup() {
                 type="file"
                 accept="image/*"
                 onChange={(e) => setImgFile(e.target.files[0])}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
               />
             </div>
 
