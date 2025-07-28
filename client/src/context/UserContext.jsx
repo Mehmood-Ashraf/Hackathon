@@ -11,9 +11,11 @@ export const UserProvider = ({children}) => {
     useEffect(() => {
         const fetchUser = async () => {
             console.log("UseEffect chala......")
+            const token = localStorage.getItem("token")
             try {
-                const res = await axios.get(`${import.meta.env.VITE_LOCAL_URL}/api/users/me`, { withCredentials : true, headers: { Authorization : `Bearer ${localStorage.getItem("token")}`
-            } })
+                const res = await axios.get(`${import.meta.env.VITE_LOCAL_URL}/api/users/me`, { withCredentials : true, headers: 
+                    token ? { Authorization : `Bearer ${localStorage.getItem("token")}`} : {}
+            } )
                 console.log(res?.data?.data)
                 setUser(res?.data?.data)
             } catch (error) {

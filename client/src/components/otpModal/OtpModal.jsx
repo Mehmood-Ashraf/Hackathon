@@ -13,9 +13,9 @@ export default function OtpModal() {
   const localUrl = import.meta.env.VITE_LOCAL_URL;
 
   const handleVerify = async () => {
-    console.log(user)
-    console.log(otpNumber)
-    console.log(localUrl)
+    // console.log(user)
+    // console.log(otpNumber)
+    // console.log(localUrl)
 
     try {
         const res = await axios.post(`${import.meta.env.VITE_LOCAL_URL}/api/auth/verifyEmail`, {
@@ -23,11 +23,13 @@ export default function OtpModal() {
             _id : user?._id || localStorage.getItem("id")
         })
 
-        console.log("API hit hue=====>", res)
+        // console.log("API hit hue=====>", res)
 
         if(res.data?.status){
             toast.success("Email Verified Successfully!")
             localStorage.removeItem("otpModalStatus")
+            localStorage.removeItem("email")
+            localStorage.removeItem("id ")
             setShowOtpModal(false)
           navigate('/login')
         }
@@ -38,13 +40,13 @@ export default function OtpModal() {
   }
 
   const resendOtpHandler = async () => {
-    console.log(user)
+    // console.log(user)
     try {
       const response = await axios.post(`${import.meta.env.VITE_LOCAL_URL}/api/auth/resend-otp`, user)
-      console.log(response)
+      // console.log(response)
       toast.success("Email send successfully!")
     } catch (error) {
-      console.log(error?.response)
+      // console.log(error?.response)
       toast.error("Email Not send")
     }
   }
@@ -53,7 +55,7 @@ export default function OtpModal() {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg">
         <h2 className="text-xl font-semibold mb-2">
-          Enter OTP for {user?.email}
+          Enter OTP for {user?.email || localStorage.getItem("email")}
         </h2>
         <input
           type="text"
@@ -72,7 +74,9 @@ export default function OtpModal() {
             Verify
           </button>
           <button
-            onClick={() => setShowOtpModal(false)}
+            onClick={() => {setShowOtpModal(false)
+              localStorage.removeItem("otpModalStatus")
+            }}
             className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
           >
             Close

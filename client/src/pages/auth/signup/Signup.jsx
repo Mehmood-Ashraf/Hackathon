@@ -37,11 +37,7 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(imgFile);
-
-    // if(formData.password.length < 8){
-    //   toast.error("Password must be at least 8 characters long")
-    // }
+    // console.log(imgFile);
 
     const validationErrors = validateForm(formData, "signup");
     setErrors(validationErrors);
@@ -72,16 +68,17 @@ export default function Signup() {
       if (res?.data?.status) {
         setUser(res.data.data);
         localStorage.setItem("id", res?.data?.data?._id)
+        localStorage.setItem("email", res?.data?.data?.email)
         localStorage.setItem("otpModalStatus", "true")
 
         toast.success("User registered successfully, OTP sent to your Email");
         setShowOtpModal(true);
-        console.log(res.data.data);
-        console.log(user);
+        // console.log(res.data.data);
+        // console.log(user);
       }
     } catch (error) {
-      console.log(error?.response?.data?.message);
-      console.log("Signup Failed");
+      // console.log(error?.response?.data?.message);
+      // console.log("Signup Failed");
       toast.error(error?.response?.data?.message || "SignUp Failed!");
     }
   };

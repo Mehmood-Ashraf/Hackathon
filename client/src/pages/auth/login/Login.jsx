@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { UserContext } from "../../../context/UserContext";
@@ -15,6 +15,13 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    const shouldShowOtpModal = localStorage.getItem("otpModalStatus");
+    if (shouldShowOtpModal === "true") {
+      setShowOtpModal(true);
+    }
+  }, []);
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const localUrl = import.meta.env.VITE_LOCAL_URL;
@@ -35,34 +42,36 @@ const Login = () => {
         toast.success("Logged In Successfully");
         setUser(res?.data?.data);
         // localStorage.setItem("token", res?.data?.data?.token)
-        console.log(res.data.data.token);
+        // console.log(res.data.data.token);
         navigate("/");
       } else {
-        console.log(res?.data?.message)
+        // console.log(res?.data?.message);
         toast.error(res?.data?.message || "Login Failed");
       }
     } catch (error) {
       console.log(error);
       const status = error?.response?.status;
       const errMsg = error?.response?.data;
-      console.log(status);
-      console.log(errMsg);
+      // console.log(status);
+      // console.log(errMsg);
       if (status === 404 && errMsg.message === "User not found!") {
         toast.error("User not registered. Redirecting to signup.....");
         setTimeout(() => {
-        navigate("/signup");
-        }, 5000)
-        return
+          navigate("/signup");
+        }, 5000);
+        return;
       } else if (status === 401 && errMsg.message === "Email not verified!") {
         toast.error(
           "Your account is not Verified. Please verify your email to login"
         );
-        setUser({
-          email: error?.response?.data?.email,
-          _id: error?.response?.data?.id,
-        });
-        console.log(user);
+        const email = error?.response?.data?.email;
+        const id = error?.response?.data?.id;
+
+        setUser({ email, _id: id });
+        // console.log(user);
         localStorage.setItem("otpModalStatus", "true");
+        localStorage.setItem("email", email);
+        localStorage.setItem("id", id);
         setShowOtpModal(true);
       } else {
         toast.error(error?.response?.data?.message || "Something went wrong!");
