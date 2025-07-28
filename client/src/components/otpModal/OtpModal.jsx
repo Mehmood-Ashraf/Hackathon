@@ -3,11 +3,16 @@ import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { UserContext } from "../../context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { closeOtpModal } from "../../features/otpModal/otpModalSlice";
 
 export default function OtpModal() {
-  const { setShowOtpModal, user} = useContext(UserContext)
+  // const { setShowOtpModal, user} = useContext(UserContext)
+  const otpModalOpen = useSelector((state) => state.modal.otpModalOpen);
+  const user = useSelector((state) => state.auth.user)
+  const dispatch = useDispatch();
   const [otpNumber, setOtpNumber] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const localUrl = import.meta.env.VITE_LOCAL_URL;
@@ -18,39 +23,47 @@ export default function OtpModal() {
     // console.log(localUrl)
 
     try {
-        const res = await axios.post(`${import.meta.env.VITE_LOCAL_URL}/api/auth/verifyEmail`, {
-            otp: otpNumber,
-            _id : user?._id || localStorage.getItem("id")
-        })
-
-        // console.log("API hit hue=====>", res)
-
-        if(res.data?.status){
-            toast.success("Email Verified Successfully!")
-            localStorage.removeItem("otpModalStatus")
-            localStorage.removeItem("email")
-            localStorage.removeItem("id ")
-            setShowOtpModal(false)
-          navigate('/login')
+      const res = await axios.post(
+        `${import.meta.env.VITE_LOCAL_URL}/api/auth/verifyEmail`,
+        {
+          otp: otpNumber,
+          _id: user?._id || localStorage.getItem("id"),
         }
+      );
 
+      // console.log("API hit hue=====>", res)
+
+      if (res.data?.status) {
+        toast.success("Email Verified Successfully!");
+        localStorage.removeItem("otpModalStatus");
+        localStorage.removeItem("email");
+        localStorage.removeItem("id");
+        dispatch(closeOtpModal());
+        // setShowOtpModal(false)
+
+        navigate("/login");
+      }
     } catch (error) {
-        toast.error(error.response?.data?.message || "Server Error")
+      toast.error(error.response?.data?.message || "Server Error");
     }
-  }
+  };
 
   const resendOtpHandler = async () => {
     // console.log(user)
     try {
-      const response = await axios.post(`${import.meta.env.VITE_LOCAL_URL}/api/auth/resend-otp`, user)
+      const response = await axios.post(
+        `${import.meta.env.VITE_LOCAL_URL}/api/auth/resend-otp`,
+        user
+      );
       // console.log(response)
-      toast.success("Email send successfully!")
+      toast.success("Email send successfully!");
     } catch (error) {
       // console.log(error?.response)
-      toast.error("Email Not send")
+      toast.error("Email Not send");
     }
-  }
+  };
 
+  if (!otpModalOpen) return null;
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg">
@@ -74,8 +87,9 @@ export default function OtpModal() {
             Verify
           </button>
           <button
-            onClick={() => {setShowOtpModal(false)
-              localStorage.removeItem("otpModalStatus")
+            onClick={() => {
+              dispatch(closeOtpModal());
+              localStorage.removeItem("otpModalStatus");
             }}
             className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
           >

@@ -1,13 +1,19 @@
 import { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { ThemeContext } from "../../context/ThemeContext";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../../features/theme/themeSlice";
+import { logoutUser } from "../../features/auth/authSlice";
 
 export default function Navbar() {
-  const { user, setUser } = useContext(UserContext);
-  const { theme, toogleTheme } = useContext(ThemeContext);
+  // const { user, setUser } = useContext(UserContext);
+  // const { theme, toogleTheme } = useContext(ThemeContext);
+  const dispatch = useDispatch()
+  const user = useSelector((state) => state.auth.user)
+  const theme = useSelector((state) => state.theme.theme)
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -25,7 +31,7 @@ export default function Navbar() {
         toast.success("UserLoggedout Successfully!");
         localStorage.removeItem("token")
       }
-      setUser(null);
+      dispatch(logOutUser());
     } catch (error) {
       toast.error("Failed to logout!");
       console.log(error);
@@ -103,7 +109,7 @@ export default function Navbar() {
               </>
             )}
             <button
-              onClick={toogleTheme}
+              onClick={() => dispatch(toggleTheme())}
               className="cursor-pointer border rounded-full text-sm hover:bg-gray-100 dark:bg-gray-800 px-1 py-1"
             >
               {theme === "light" ? "🌙" : "☀️"}

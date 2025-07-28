@@ -3,13 +3,13 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const otpModalSlice = createSlice({
     name : "modal",
-    initialState : { otpModalopen : false },
+    initialState : { otpModalOpen : false },
     reducers : {
         openOtpModal: (state) => {
-            state.otpModalopen = true
+            state.otpModalOpen = true
         },
         closeOtpModal: (state) => {
-            state.otpModalopen = false
+            state.otpModalOpen = false
         }
     }
 })

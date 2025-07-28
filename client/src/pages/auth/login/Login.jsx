@@ -6,11 +6,17 @@ import { UserContext } from "../../../context/UserContext";
 import { GoEye } from "react-icons/go";
 import { GoEyeClosed } from "react-icons/go";
 import OtpModal from "../../../components/otpModal/OtpModal";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../../features/auth/authSlice";
+import { openOtpModal } from "../../../features/otpModal/otpModalSlice";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { setUser, user, showOtpModal, setShowOtpModal } =
-    useContext(UserContext);
+  const dispatch = useDispatch()
+  const user = useSelector((state) => state.auth.user)
+  const otpModalOpen = useSelector((state) => state.modal.otpModalOpen)
+  // const { setUser, user, showOtpModal, setShowOtpModal } =
+  //   useContext(UserContext);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,7 +25,7 @@ const Login = () => {
   useEffect(() => {
     const shouldShowOtpModal = localStorage.getItem("otpModalStatus");
     if (shouldShowOtpModal === "true") {
-      setShowOtpModal(true);
+      dispatch(openOtpModal())
     }
   }, []);
 
@@ -40,9 +46,11 @@ const Login = () => {
       });
       if (res?.data?.status) {
         toast.success("Logged In Successfully");
-        setUser(res?.data?.data);
-        // localStorage.setItem("token", res?.data?.data?.token)
-        // console.log(res.data.data.token);
+        dispatch(setUser(res?.data?.data))
+        // setUser(res?.data?.data);
+        localStorage.setItem("token", res?.data?.data?.token)
+        console.log(res.data.data.token);
+        console.log(user)
         navigate("/");
       } else {
         // console.log(res?.data?.message);
@@ -67,12 +75,12 @@ const Login = () => {
         const email = error?.response?.data?.email;
         const id = error?.response?.data?.id;
 
-        setUser({ email, _id: id });
+        dispatch(setUser({ email, _id: id }));
         // console.log(user);
         localStorage.setItem("otpModalStatus", "true");
         localStorage.setItem("email", email);
         localStorage.setItem("id", id);
-        setShowOtpModal(true);
+        dispatch(openOtpModal())
       } else {
         toast.error(error?.response?.data?.message || "Something went wrong!");
       }
@@ -144,7 +152,7 @@ const Login = () => {
           </button>
         </form>
       </div>
-      {showOtpModal && <OtpModal />}
+      {otpModalOpen && <OtpModal />}
     </div>
   );
 };

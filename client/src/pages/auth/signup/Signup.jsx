@@ -7,11 +7,16 @@ import { GoEye } from "react-icons/go";
 import { GoEyeClosed } from "react-icons/go";
 import { validateForm } from "../../../utils/formValidation";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, setLoading, setError } from "../../../features/auth/authSlice"
+import { openOtpModal } from "../../../features/otpModal/otpModalSlice";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
-  const { user, setUser, showOtpModal, setShowOtpModal } =
-    useContext(UserContext);
+  const dispatch = useDispatch()
+  const otpModalOpen = useSelector((state) => state.modal.otpModalOpen)
+  // const { user, setUser, showOtpModal, setShowOtpModal } =
+    // useContext(UserContext);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     userName: "",
@@ -21,15 +26,16 @@ export default function Signup() {
     city: "",
   });
   const [imgFile, setImgFile] = useState("");
+  
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const localUrl = import.meta.env.VITE_LOCAL_URL;
 
   useEffect(() => {
     const shouldShowOtpModal = localStorage.getItem("otpModalStatus")
     if(shouldShowOtpModal === "true"){
-      setShowOtpModal(true)
+      dispatch(openOtpModal())
     }
-  }, [])
+  }, [dispatch])
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,12 +45,15 @@ export default function Signup() {
     e.preventDefault();
     // console.log(imgFile);
 
+
+    dispatch(setLoading(true))
+
     const validationErrors = validateForm(formData, "signup");
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
       return toast.error("Please fix the validation Errors");
-    }
+    } 
 
     try {
       const data = new FormData();
@@ -66,13 +75,14 @@ export default function Signup() {
         data
       );
       if (res?.data?.status) {
-        setUser(res.data.data);
+        dispatch(setUser(res.data.data));
         localStorage.setItem("id", res?.data?.data?._id)
         localStorage.setItem("email", res?.data?.data?.email)
         localStorage.setItem("otpModalStatus", "true")
 
         toast.success("User registered successfully, OTP sent to your Email");
-        setShowOtpModal(true);
+        dispatch(setLoading(false))
+        dispatch(openOtpModal())
         // console.log(res.data.data);
         // console.log(user);
       }
@@ -80,8 +90,11 @@ export default function Signup() {
       // console.log(error?.response?.data?.message);
       // console.log("Signup Failed");
       toast.error(error?.response?.data?.message || "SignUp Failed!");
+      dispatch(setLoading(false))
     }
   };
+
+  console.log(otpModalOpen)
 
   return (
     <>
@@ -90,7 +103,7 @@ export default function Signup() {
           <div className="flex flex-col items-center gap-y-2">
             <h1 className="text-3xl font-semibold text-blue-600">Signup</h1>
             <p className="text-muted-foreground text-sm ">
-              Create a new account
+              
             </p>
           </div>
           <form
@@ -235,7 +248,7 @@ export default function Signup() {
         </div>
       </div>
 
-      {showOtpModal ? <OtpModal /> : null}
+      {otpModalOpen ? <OtpModal /> : null}
     </>
   );
 }
