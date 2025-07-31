@@ -11,8 +11,8 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 dotenv.config();
 
 export const register = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
+  console.log(req?.body);
+  console.log(req?.file);
   const { userName, email, password, country, city } = req.body;
   console.log(userName);
   // const imagePath = req.file ? req.file.path : null;
