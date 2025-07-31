@@ -124,11 +124,13 @@ export const verifyOTP = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password)
   try {
     if (!email || !password) {
       return errorHandler(res, 400, "Email and Password are required");
     }
     const user = await User.findOne({ email: email });
+    console.log(user)
     if (!user) {
       return errorHandler(res, 404, "User not found!");
     }
@@ -148,6 +150,7 @@ export const login = async (req, res) => {
     }
 
     const token = generateToken(user);
+    console.log(token)
 
     const {
       password: userPassword,
@@ -171,7 +174,7 @@ export const login = async (req, res) => {
       otherDetails
     );
   } catch (error) {
-    console.error("Error during login", error.message);
+    console.log("Error during login", error.message);
     return errorHandler(res, 400, "Something went wrong during Login!");
   }
 };
